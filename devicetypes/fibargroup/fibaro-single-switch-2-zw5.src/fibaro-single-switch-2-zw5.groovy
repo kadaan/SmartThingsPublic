@@ -14,6 +14,7 @@ metadata {
 
         command "reset"
 
+        fingerprint mfr: "010F", prod: "0403", model: "3000"
         fingerprint mfr: "010F", prod: "0403", model: "2000"
         fingerprint mfr: "010F", prod: "0403", model: "1000"
      }
@@ -175,7 +176,7 @@ private syncNext() {
     }
 }
 
-private syncCheck() {
+def syncCheck() {
     logging("Executing syncCheck()","info")
     def failed = []
     def incorrect = []
