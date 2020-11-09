@@ -29,7 +29,8 @@
 
  metadata {
 	definition (name: "Aeon Multisensor 6 (Advanced)", namespace: "erocm123", author: "Eric Maycock", vid:"generic-motion-7") {
-		capability "Motion Sensor"
+		capability "Actuator"
+        capability "Motion Sensor"
 		capability "Acceleration Sensor"
 		capability "Temperature Measurement"
 		capability "Relative Humidity Measurement"
@@ -102,7 +103,7 @@
         
 		valueTile(
         	"ultravioletIndex","device.ultravioletIndex", inactiveLabel: false, width: 2, height: 2) {
-				state "ultravioletIndex",label:'${currentValue} UV INDEX',unit:""
+				state "ultravioletIndex",label:'${currentValue} UV INDEX', unit:""
 		}
 		standardTile("acceleration", "device.acceleration", inactiveLabel: false, width: 2, height: 2) {
 			state("inactive", label:'clear', icon:"st.motion.acceleration.inactive", backgroundColor:"#ffffff")
@@ -343,12 +344,16 @@ def zwaveEvent(physicalgraph.zwave.commands.notificationv3.NotificationReport cm
 		switch (cmd.event) {
 			case 0:
 				//result << motionEvent(0)
+	            logging("Tamper cleared")
 				result << createEvent(name: "tamper", value: "clear", descriptionText: "$device.displayName tamper cleared")
                 result << createEvent(name: "acceleration", value: "inactive", descriptionText: "$device.displayName tamper cleared", displayed:false)
 				break
 			case 3:
 				result << createEvent(name: "tamper", value: "detected", descriptionText: "$device.displayName was tampered")
                 result << createEvent(name: "acceleration", value: "active", descriptionText: "$device.displayName was moved", displayed:false)
+                use(groovy.time.TimeCategory) {
+	                runOnce(new Date() + 10.seconds, resetTamperAlert)
+                }
 				break
 			case 7:
 				//result << motionEvent(1)
@@ -518,6 +523,7 @@ private getOverride() {
 }
 
 def resetTamperAlert() {
+    logging("Reset tamper alert")
     sendEvent(name: "tamper", value: "clear", descriptionText: "$device.displayName tamper cleared")
     sendEvent(name: "acceleration", value: "inactive", descriptionText: "$device.displayName tamper cleared")
     sendEvent(name: "motion", value: "inactive", descriptionText: "$device.displayName motion has stopped")
