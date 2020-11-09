@@ -352,7 +352,7 @@ def zwaveEvent(physicalgraph.zwave.commands.notificationv3.NotificationReport cm
 				result << createEvent(name: "tamper", value: "detected", descriptionText: "$device.displayName was tampered")
                 result << createEvent(name: "acceleration", value: "active", descriptionText: "$device.displayName was moved", displayed:false)
                 use(groovy.time.TimeCategory) {
-	                runOnce(new Date() + 10.seconds, resetTamperAlert)
+	                runOnce(settings."301".toInteger().seconds.from.now, resetTamperAlert)
                 }
 				break
 			case 7:
@@ -1141,6 +1141,15 @@ Default: Off
   <Value type="boolean" index="enableDebugging" label="Enable Debug Logging?" value="true" setting_type="preference" fw="1.06,1.07,1.08,1.09,1.10,1.11,1.12,1.13,1.06EU,1.07EU,1.08EU,1.09EU,1.10EU,1.11EU,1.12EU,1.13EU">
     <Help>
 
+    </Help>
+  </Value>
+  <Value type="short" byteSize="2" index="301" label="Tamper reset time" min="10" max="3600" value="10" setting_type="zwave" fw="1.06,1.07,1.08,1.09,1.10,1.11,1.12,1.13,1.06EU,1.07EU,1.08EU,1.09EU,1.10EU,1.11EU,1.12EU,1.13EU" displayDuringSetup="true">
+    <Help>
+Number of seconds to wait to tamper cleared after a tamper detected event.
+Range: 10~3600.
+Default: 10 (10 seconds)
+Note:
+(1), The time unit is seconds.
     </Help>
   </Value>
 </configuration>
